@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<title>Files</title>
+    <script src="/assets/vendor/jquery-1.9.1.min.js" type="text/javascript"></script>
+    <script src="/assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/vendor/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="/assets/app.js"></script>
+    <link rel="stylesheet" href="/assets/vendor/datatable/css/jquery.dataTables.css">
+    <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.min.css">
+  </head>
+  <body style="padding-top: 50px;">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+
+            <a class="brand" href="#">
+              Files
+            </a>
+
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+            </ul>
+
+
+        </div>
+      </div>
+    </div>
+
+
+	<div class="container">
+      <div class="row">
+        <table class="directory">
+        </table>
+      </div>
+      <div class="row upload-form" style="display:none">
+        <form action="." method="post" enctype="multipart/form-data">
+          <fieldset>
+            <legend class="freeform-form-label">Create a new directory in this directory</legend>
+            <input type="hidden" name="t" value="mkdir" />
+            <input type="hidden" name="when_done" value="." class="return_to"/>
+            <input type="hidden" name="format" value="sdmf" />
+            New directory name:  <input type="text" name="name" />
+            <input type="submit" value="Create" />
+          </fieldset>
+        </form>
+        <form action="." method="post" enctype="multipart/form-data">
+          <fieldset>
+            <legend class="freeform-form-label">Upload a file to this directory</legend>
+            <input type="hidden" name="t" value="upload" />
+            <input type="hidden" name="when_done" value="." class="return_to" />
+            <input type="hidden" name="format" value="chk" />
+            Choose a file to upload:  <input type="file" class="freeform-input-file" name="file" />
+            <input type="submit" value="Upload" />
+          </fieldset>
+        </form>
+      </div>
+	</div>
+  </body>
+</html>
