@@ -20,15 +20,17 @@ function make_directory_grid() {
   // make a call for json data at api uri
   $.getJSON('/a/dir/' + currentId, function(data) {
     var children = data[1]['children'];
-    var filename = '';
-    var size = '';
-    var link = '';
+    var filename = null;
+    var size = null;
+    var link = null;
+    var ftype = null;
     var ctime = new Date();
     // for each child make fill Array with rows for each file
     $.each(children, function(name, child_d) {
       filename = '';
       size = child_d[1].size;
       link = child_d[1].rw_uri;
+      type = (child_d[0] == 'filenode') ? 'file' : 'directory';
       if (size == null)
           size = 0;
       if (link == null)
@@ -39,7 +41,7 @@ function make_directory_grid() {
       ctime = new Date(Math.round(child_d[1].metadata.tahoe.linkcrtime*1000));
       ctime = ctime.toISOString();
       ctime = '<abbr class="timeago" title="' + ctime + '">' + ctime + '</abbr>';
-      child_rows.push([name, child_d[0], size, ctime]);
+      child_rows.push([name, type, size, ctime]);
     });
     // if nothing in array dont make table or show upload stuffs
     if (child_rows.index != 0) {
