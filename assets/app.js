@@ -23,6 +23,7 @@ function make_directory_grid() {
     var filename = '';
     var size = '';
     var link = '';
+    var ctime = new Date();
     // for each child make fill Array with rows for each file
     $.each(children, function(name, child_d) {
       filename = '';
@@ -35,7 +36,10 @@ function make_directory_grid() {
       if (child_d[0] == 'filenode')
           filename = '/' + name;
       name = '<a href="' + escape(get_link(link) + filename) + '">' + name + '</a>';
-      child_rows.push([name, child_d[0], size]);
+      ctime = new Date(Math.round(child_d[1].metadata.tahoe.linkcrtime*1000));
+      ctime = ctime.toISOString();
+      ctime = '<abbr class="timeago" title="' + ctime + '">' + ctime + '</abbr>';
+      child_rows.push([name, child_d[0], size, ctime]);
     });
     // if nothing in array dont make table or show upload stuffs
     if (child_rows.index != 0) {
@@ -45,11 +49,18 @@ function make_directory_grid() {
             { "sTitle": "Filename" },
             { "sTitle": "Type" },
             { "sTitle": "Size" },
-          ]
+            { "sTitle": "Created" },
+          ],
+          "aLengthMenu": [
+            [25, 50, 100, 200, -1],
+            [25, 50, 100, 200, "All"]
+          ],
+          "iDisplayLength" : -1
       });
       $("form").attr("action", "/a/dir/" + currentId);
       $("input.return_to").attr("value", location.pathname);
       $("div.upload-form").show();
+      $("abbr.timeago").timeago();
     }
   });
 }
