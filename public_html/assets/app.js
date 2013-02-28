@@ -15,17 +15,16 @@ function get_link(lafs_uri) {
     if (lafs_uri.substr(0, k.length) == k)
       return link_map[k] + lafs_uri.substr(k.length).replace(/:/g, '/');
   }
+  return '';
 }
 
 function gen_unlink_button(filename, post_uri, return_to) {
-  var html_form = new Array();
-  html_form.push('<form action="' + post_uri +'" method="post">');
-  html_form.push('<input type="hidden" name="t" value="unlink" />');
-  html_form.push('<input type="hidden" name="name" value="' + filename + '" />');
-  html_form.push('<input type="hidden" name="when_done" value="' + return_to + '" />');
-  html_form.push('<input type="submit" name="unlink" value="unlink" />');
-  html_form.push('</form>');
-  return html_form.join('');
+  var link_a = new Array();
+  link_a.push('<a href="#" class="unlink_button" data-return-to="' + return_to + '"');
+  link_a.push(' data-filename="' + filename + '"');
+  link_a.push(' data-post-uri="' + post_uri + '"');
+  link_a.push('>delete</a>');
+  return ' ' + link_a.join('');
 }
 
 function make_directory_grid(currentId) {
@@ -38,7 +37,7 @@ function make_directory_grid(currentId) {
     var obj_uri = null;
     var type = null;
     var name_link = null;
-    var ctime = new Date();
+    var ctime = null;
     // for each filenode or dirnode fill Array with rows
     $.each(children, function(name, child_d) {
       size = child_d[1].size;
@@ -52,34 +51,62 @@ function make_directory_grid(currentId) {
         filename = '/' + name;
       type = (child_d[0] == 'filenode') ? 'file' : 'directory';
       name_link = '<a href="' + escape(get_link(obj_uri) + filename) + '">' + name + '</a>';
-      // add delete link if its not ro
-      name_link += (currentId.substr(0,3) == "ro/") ? '' : gen_unlink_button(name, uri_map.dir_api + currentId, uri_map.dir_id + currentId);
       ctime = new Date(Math.round(child_d[1].metadata.tahoe.linkcrtime*1000));
       ctime = ctime.toISOString();
       ctime = '<abbr class="timeago" title="' + ctime + '">' + ctime + '</abbr>';
-      child_rows.push([name_link, type, size, ctime]);
+      // add delete link if its not ro
+      if (currentId.substr(0,3) == "ro/") {
+        child_rows.push([name_link, type, size, ctime]);
+      }
+      else {
+        child_rows.push([name_link, type, size, ctime, gen_unlink_button(name, uri_map.dir_api + currentId, uri_map.dir_id + currentId)]);
+      }
     });
     // if nothing in array dont make table or show upload stuffs
     if (child_rows.index != 0) {
-      $("table.directory").dataTable({
+      var table_config = {
         "aaData": child_rows,
         "aoColumns": [
-          { "sTitle": "Filename" },
-          { "sTitle": "Type" },
-          { "sTitle": "Size" },
-          { "sTitle": "Created" },
+          { "sTitle": "Filename", "sWidth": "70%" },
+          { "sTitle": "Type", "sClass": "text-right" },
+          { "sTitle": "Size", "sClass": "text-right" },
+          { "sTitle": "Created", "sClass": "text-right" }
         ],
         "aLengthMenu": [
           [25, 50, 100, 200, -1],
           [25, 50, 100, 200, "All"]
         ],
-        "iDisplayLength" : -1
-      });
+        "iDisplayLength" : -1,
+        "aoColumnDefs": []
+      };
+      if (currentId.substr(0,3) != "ro/") {
+        // options for additional column in datatable
+        table_config.aoColumns.push({"sTitle": "Options"});
+        table_config.aoColumnDefs.push({ "sWidth": "5%", "aTargets": [ -1 ] });
+        table_config.aoColumnDefs.push({ "bSortable": false, "aTargets": [ -1 ] });
+        table_config.aoColumnDefs.push({ "bSearchable": false, "aTargets": [ -1 ] });
+        table_config.aoColumnDefs.push({ "sClass": 'text-right', "aTargets": [ -1 ] });
+      }
+      // init table and form attributes
+      $("table.directory").dataTable(table_config);
       $("form").attr("action", uri_map.dir_api + currentId);
       $("input.return_to").attr("value", location.pathname);
       $("abbr.timeago").timeago();
-      if (currentId.substr(0,3) != "ro/")
+
+      // do stuff with non-read only links after table is generated
+      if (currentId.substr(0,3) != "ro/") {
+        $("a.unlink_button").click(function() {
+          var post_data = {};
+          post_data.t = 'unlink';
+          post_data.name = $(this).attr("data-filename");
+          post_data.when_done = $(this).attr("data-return-to");
+          $.post($(this).attr("data-post-uri"), post_data, function(data) {
+            window.location.href = post_data.when_done;
+          });
+        });
+        // dont need to show upload form if ro link
         $("div.upload-form").show();
+      }
     }
   });
 }
