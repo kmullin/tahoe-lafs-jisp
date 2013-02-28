@@ -25,7 +25,7 @@ function make_directory_grid() {
     var link = null;
     var ftype = null;
     var ctime = new Date();
-    // for each child make fill Array with rows for each file
+    // for each child fill Array with rows for each file for DataTable
     $.each(children, function(name, child_d) {
       filename = '';
       size = child_d[1].size;
@@ -69,7 +69,9 @@ function make_directory_grid() {
 
 $(document).ready(function() {
 
-  if (location.pathname.substring(0, 3) == '/d/') {
+  // if a dir cap
+  if ( /^\/d\/\w{26}\/\w{52}\/?$/g.test(location.pathname) ) {
     make_directory_grid();
   }
+
 });
