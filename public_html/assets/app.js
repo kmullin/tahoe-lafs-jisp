@@ -98,6 +98,7 @@ function make_directory_grid(currentId) {
     var child_rows = fill_grid_rows(data[1].children, currentId);
     // if nothing in array dont make table or show upload stuffs
     if (child_rows.index != 0) {
+      $("h3.heading").text("Directory listing").show();
       light_up_table(child_rows, currentId); // init table
       $("form").attr("action", uri_map.dir_api + currentId);
       $("input.return_to").attr("value", location.pathname);
