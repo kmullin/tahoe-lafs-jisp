@@ -64,6 +64,7 @@ function fill_grid_rows(children, currentId) {
 
 function light_up_table(child_rows, currentId) {
   var table_config = {
+    "sDom": "firt",
     "aaData": child_rows,
     "aoColumns": [
       { "sTitle": "Filename", "sWidth": "70%" },

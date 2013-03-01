@@ -32,43 +32,40 @@
 
 	<div class="container">
       <div class="row">
-        <div class="span6">
-          <h2>some content</h2>
-        </div>
+          <h3>Directory listing</h3>
       </div>
       <div class="row">
-        <table class="directory">
-        </table>
+        <table class="directory"></table>
       </div>
-      <div class="row upload-form" style="display:none">
-        <h3>Directory operations</h3>
-        <div class="span7">
-        <form action="." method="post" enctype="multipart/form-data">
-          <fieldset>
-            <legend class="freeform-form-label">Create a new directory in this directory</legend>
-            <input type="hidden" name="t" value="mkdir" />
-            <input type="hidden" name="when_done" value="." class="return_to"/>
-            <input type="hidden" name="format" value="sdmf" />
-            New directory name:  <input type="text" name="name" />
-            <input type="submit" value="Create" />
-          </fieldset>
-        </form>
-        <form action="." method="post" enctype="multipart/form-data">
-          <fieldset>
-            <legend class="freeform-form-label">Upload a file to this directory</legend>
-            <input type="hidden" name="t" value="upload" />
-            <input type="hidden" name="when_done" value="." class="return_to" />
-            <input type="hidden" name="format" value="chk" />
-            Choose a file to upload:  <input type="file" class="freeform-input-file" name="file" />
-            <input type="submit" value="Upload" />
-          </fieldset>
-        </form>
+      <div class="row upload-form" style="margin-top:35px;display:none">
+        <div class="span5">
+          <form action="." method="post" enctype="multipart/form-data">
+            <fieldset>
+              <legend class="freeform-form-label">Directory Operations</legend>
+              <input type="hidden" name="t" value="mkdir" />
+              <input type="hidden" name="when_done" value="." class="return_to"/>
+              <input type="hidden" name="format" value="sdmf" />
+              <label>New directory name:</label>
+              <input type="text" name="name" />
+              <button class="btn" type="submit">Create</button>
+            </fieldset>
+          </form>
+          <form action="." method="post" enctype="multipart/form-data">
+            <fieldset>
+              <input type="hidden" name="t" value="upload" />
+              <input type="hidden" name="when_done" value="." class="return_to" />
+              <input type="hidden" name="format" value="chk" />
+              <label>Choose a file to upload:</label>
+              <input type="file" name="file" />
+              <button class="btn" type="submit">Upload</button>
+            </fieldset>
+          </form>
         </div>
-        <div class="span4 well">
-        <ul class="unstyled">
-        <li class="muted"><strong>Extra Info</strong></li>
-        <li>read-only link: <a href="" class="current-ro-link">here</a></li>
-        </ul>
+        <div class="span5 well">
+          <ul class="unstyled">
+            <li class="muted"><strong>Extra Info</strong></li>
+            <li>read-only link: <a href="" class="current-ro-link">here</a></li>
+          </ul>
         </div>
       </div>
 	</div>
