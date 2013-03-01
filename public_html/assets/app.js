@@ -27,72 +27,82 @@ function gen_unlink_button(filename, post_uri, return_to) {
   return ' ' + link_a.join('');
 }
 
+function fill_grid_rows(children, currentId) {
+  var filename = null;
+  var size = null;
+  var obj_uri = null;
+  var type = null;
+  var name_link = null;
+  var ctime = null;
+  var child_rows = new Array;
+  // for each filenode or dirnode fill Array with rows
+  $.each(children, function(name, child_d) {
+    size = child_d[1].size;
+    if (size == null)
+      size = 0;
+    obj_uri = child_d[1].rw_uri;
+    if (obj_uri == null)
+      obj_uri = child_d[1].ro_uri;
+    filename = '';
+    if (child_d[0] == 'filenode')
+      filename = '/' + name;
+    type = (child_d[0] == 'filenode') ? 'file' : 'directory';
+    name_link = '<a href="' + escape(get_link(obj_uri) + filename) + '">' + name + '</a>';
+    ctime = new Date(Math.round(child_d[1].metadata.tahoe.linkcrtime*1000));
+    ctime = ctime.toISOString();
+    ctime = '<abbr class="timeago" title="' + ctime + '">' + ctime + '</abbr>';
+    // add delete link if its not ro
+    if (currentId.substr(0,3) == "ro/") {
+      child_rows.push([name_link, type, size, ctime]);
+    }
+    else {
+      child_rows.push([name_link, type, size, ctime, gen_unlink_button(name, uri_map.dir_api + currentId, uri_map.dir_id + currentId)]);
+    }
+  });
+  return child_rows;
+}
+
+function light_up_table(child_rows, currentId) {
+  var table_config = {
+    "aaData": child_rows,
+    "aoColumns": [
+      { "sTitle": "Filename", "sWidth": "70%" },
+      { "sTitle": "Type", "sClass": "text-right" },
+      { "sTitle": "Size", "sClass": "text-right" },
+      { "sTitle": "Created", "sClass": "text-right" }
+    ],
+    "aLengthMenu": [
+      [25, 50, 100, 200, -1],
+      [25, 50, 100, 200, "All"]
+    ],
+    "iDisplayLength" : -1,
+    "aoColumnDefs": []
+  };
+  if (currentId.substr(0,3) != "ro/") {
+    // options for additional column in datatable
+    table_config.aoColumns.push({"sTitle": "Options"});
+    table_config.aoColumnDefs.push({ "sWidth": "5%", "aTargets": [ -1 ] });
+    table_config.aoColumnDefs.push({ "bSortable": false, "aTargets": [ -1 ] });
+    table_config.aoColumnDefs.push({ "bSearchable": false, "aTargets": [ -1 ] });
+    table_config.aoColumnDefs.push({ "sClass": 'text-right', "aTargets": [ -1 ] });
+  }
+  // init table and form attributes
+  $("table.directory").dataTable(table_config);
+  return true;
+}
+
 function make_directory_grid(currentId) {
-  var child_rows = new Array();
   // make a call for json data at api uri
   $.getJSON(uri_map.dir_api + currentId, function(data) {
-    var children = data[1].children;
-    var filename = null;
-    var size = null;
-    var obj_uri = null;
-    var type = null;
-    var name_link = null;
-    var ctime = null;
-    // for each filenode or dirnode fill Array with rows
-    $.each(children, function(name, child_d) {
-      size = child_d[1].size;
-      if (size == null)
-        size = 0;
-      obj_uri = child_d[1].rw_uri;
-      if (obj_uri == null)
-        obj_uri = child_d[1].ro_uri;
-      filename = '';
-      if (child_d[0] == 'filenode')
-        filename = '/' + name;
-      type = (child_d[0] == 'filenode') ? 'file' : 'directory';
-      name_link = '<a href="' + escape(get_link(obj_uri) + filename) + '">' + name + '</a>';
-      ctime = new Date(Math.round(child_d[1].metadata.tahoe.linkcrtime*1000));
-      ctime = ctime.toISOString();
-      ctime = '<abbr class="timeago" title="' + ctime + '">' + ctime + '</abbr>';
-      // add delete link if its not ro
-      if (currentId.substr(0,3) == "ro/") {
-        child_rows.push([name_link, type, size, ctime]);
-      }
-      else {
-        child_rows.push([name_link, type, size, ctime, gen_unlink_button(name, uri_map.dir_api + currentId, uri_map.dir_id + currentId)]);
-      }
-    });
+    var child_rows = fill_grid_rows(data[1].children, currentId);
     // if nothing in array dont make table or show upload stuffs
     if (child_rows.index != 0) {
-      var table_config = {
-        "aaData": child_rows,
-        "aoColumns": [
-          { "sTitle": "Filename", "sWidth": "70%" },
-          { "sTitle": "Type", "sClass": "text-right" },
-          { "sTitle": "Size", "sClass": "text-right" },
-          { "sTitle": "Created", "sClass": "text-right" }
-        ],
-        "aLengthMenu": [
-          [25, 50, 100, 200, -1],
-          [25, 50, 100, 200, "All"]
-        ],
-        "iDisplayLength" : -1,
-        "aoColumnDefs": []
-      };
-      if (currentId.substr(0,3) != "ro/") {
-        // options for additional column in datatable
-        table_config.aoColumns.push({"sTitle": "Options"});
-        table_config.aoColumnDefs.push({ "sWidth": "5%", "aTargets": [ -1 ] });
-        table_config.aoColumnDefs.push({ "bSortable": false, "aTargets": [ -1 ] });
-        table_config.aoColumnDefs.push({ "bSearchable": false, "aTargets": [ -1 ] });
-        table_config.aoColumnDefs.push({ "sClass": 'text-right', "aTargets": [ -1 ] });
-      }
-      // init table and form attributes
-      $("table.directory").dataTable(table_config);
+      light_up_table(child_rows, currentId); // init table
       $("form").attr("action", uri_map.dir_api + currentId);
       $("input.return_to").attr("value", location.pathname);
       $("abbr.timeago").timeago();
-
+      var ro_link = get_link(data[1].ro_uri);
+      $("a.current-ro-link").attr("href", ro_link);
       // do stuff with non-read only links after table is generated
       if (currentId.substr(0,3) != "ro/") {
         $("a.unlink_button").click(function() {
@@ -109,6 +119,7 @@ function make_directory_grid(currentId) {
       }
     }
   });
+  return true;
 }
 
 $(document).ready(function() {
