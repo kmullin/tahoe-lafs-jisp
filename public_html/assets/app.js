@@ -27,6 +27,13 @@ function gen_unlink_button(filename, post_uri, return_to) {
   return ' ' + link_a.join('');
 }
 
+function readablizeBytes(bytes) {
+  // stolen from http://stackoverflow.com/a/10469752
+  var s = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'];
+  var e = Math.floor(Math.log(bytes) / Math.log(1024));
+  return (bytes / Math.pow(1024, Math.floor(e))).toFixed(2) + " " + s[e];
+}
+
 function fill_grid_rows(children, currentId) {
   var file_uri = null;
   var size = null;
@@ -40,6 +47,8 @@ function fill_grid_rows(children, currentId) {
     size = child_d[1].size;
     if (size == null)
       size = 0;
+    else
+      size = readablizeBytes(size);
     obj_uri = child_d[1].rw_uri;
     if (obj_uri == null)
       obj_uri = child_d[1].ro_uri;
@@ -69,7 +78,7 @@ function light_up_table(child_rows, currentId) {
     "aoColumns": [
       { "sTitle": "Filename", "sWidth": "70%" },
       { "sTitle": "Type", "sClass": "text-right" },
-      { "sTitle": "Size", "sClass": "text-right" },
+      { "sTitle": "Size", "sClass": "text-right", "sWidth": "15%" },
       { "sTitle": "Created", "sClass": "text-right" }
     ],
     "aLengthMenu": [
@@ -82,7 +91,6 @@ function light_up_table(child_rows, currentId) {
   if (currentId.substr(0,3) != "ro/") {
     // options for additional column in datatable
     table_config.aoColumns.push({"sTitle": "Options"});
-    table_config.aoColumnDefs.push({ "sWidth": "5%", "aTargets": [ -1 ] });
     table_config.aoColumnDefs.push({ "bSortable": false, "aTargets": [ -1 ] });
     table_config.aoColumnDefs.push({ "bSearchable": false, "aTargets": [ -1 ] });
     table_config.aoColumnDefs.push({ "sClass": 'text-right', "aTargets": [ -1 ] });
