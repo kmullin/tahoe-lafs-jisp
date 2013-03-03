@@ -28,7 +28,7 @@ function gen_unlink_button(filename, post_uri, return_to) {
 }
 
 function fill_grid_rows(children, currentId) {
-  var filename = null;
+  var file_uri = null;
   var size = null;
   var obj_uri = null;
   var type = null;
@@ -43,11 +43,11 @@ function fill_grid_rows(children, currentId) {
     obj_uri = child_d[1].rw_uri;
     if (obj_uri == null)
       obj_uri = child_d[1].ro_uri;
-    filename = '';
+    file_uri = '';
     if (child_d[0] == 'filenode')
-      filename = '/' + name;
+      file_uri = '/' + name;
     type = (child_d[0] == 'filenode') ? 'file' : 'directory';
-    name_link = '<a href="' + escape(get_link(obj_uri) + filename) + '">' + name + '</a>';
+    name_link = '<a class="' + type + '" title="' + ((child_d[0] == 'filenode') ? name : 'Directory: ' + child_d[1].verify_uri.substr(18, 5)) + '" href="' + escape(get_link(obj_uri) + file_uri) + '">' + name + '</a>';
     ctime = new Date(Math.round(child_d[1].metadata.tahoe.linkcrtime*1000));
     ctime = ctime.toISOString();
     ctime = '<abbr class="timeago" title="' + ctime + '">' + ctime + '</abbr>';
