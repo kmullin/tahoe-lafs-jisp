@@ -1,3 +1,5 @@
+var reverse_uris = true;
+
 var uri_map = {
   dir_id: '/d/',
   file_id: '/f/',
@@ -11,9 +13,19 @@ var link_map = {
 };
 
 function get_link(lafs_uri) {
+  var buffer = null;
   for (var k in link_map) {
-    if (lafs_uri.substr(0, k.length) == k)
-      return link_map[k] + lafs_uri.substr(k.length).replace(/:/g, '/');
+    if (lafs_uri.substr(0, k.length) == k) {
+      buffer = lafs_uri.substr(k.length);
+      if (reverse_uris) {
+        buffer = buffer.split(':');
+        var swap = buffer[0];
+        buffer[0] = buffer[1];
+        buffer[1] = swap;
+        buffer = buffer.join(':');
+      }
+      return link_map[k] + buffer.replace(/:/g, '/');
+    }
   }
   return '';
 }
@@ -138,7 +150,7 @@ function make_directory_grid(currentId) {
 $(document).ready(function() {
 
   // dynamically create regex for matching view (dirs) uris
-  var re = new RegExp("^" + uri_map.dir_id.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1") + "((?:ro/)?\\w{26}\\/\\w{52})\\/?$","g");
+  var re = new RegExp("^" + uri_map.dir_id.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1") + "((?:ro/)?(?:(?:\\w{26}\\/\\w{52})|(?:\\w{52}\\/\\w{26})))\\/?$","g");
   var matched_id = re.exec(location.pathname);
   if ( matched_id != null ) {
     make_directory_grid(matched_id[1]);
