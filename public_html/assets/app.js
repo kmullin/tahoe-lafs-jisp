@@ -20,7 +20,7 @@ function get_link(lafs_uri) {
 
 function gen_unlink_button(filename, post_uri, return_to) {
   var link_a = new Array();
-  link_a.push('<a href="#" class="unlink_button text-error" data-return-to="' + return_to + '"');
+  link_a.push('<a href="" class="unlink_button text-error" data-return-to="' + return_to + '"');
   link_a.push(' data-filename="' + filename + '"');
   link_a.push(' data-post-uri="' + post_uri + '"');
   link_a.push('>delete</a>');
