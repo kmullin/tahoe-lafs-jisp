@@ -30,10 +30,23 @@ function get_link(lafs_uri) {
   return '';
 }
 
+function rename_form() {
+  var ren_form = new Array();
+  ren_form.push('<form action="." class="rename" method="post" enctype="multipart/form-data">');
+  ren_form.push('<fieldset>');
+  ren_form.push('<input type="hidden" name="t" value="rename" />');
+  ren_form.push('<input type="hidden" name="when_done" value="." />');
+  ren_form.push('<input type="text" readonly="true" name="from_name" value="" />');
+  ren_form.push('<input type="text" name="to_name" />');
+  ren_form.push('<input type="submit" value="rename" />');
+  ren_form.push('</fieldset></form>');
+  return ren_form.join('');
+}
+
 function gen_buttons(filename, post_uri, return_to) {
   var link_a = new Array();
   $.each(['unlink', 'rename'], function(i, type) {
-    link_a.push('<button class="btn btn-danger btn-mini ' + type + '-button"');
+    link_a.push('<button class="btn btn-' + (type == 'unlink' ? 'danger' : 'primary' ) + ' btn-mini ' + type + '-button"');
     link_a.push(' data-return-to="' + return_to + '"');
     link_a.push(' data-filename="' + filename + '"');
     link_a.push(' data-post-uri="' + post_uri + '"');
@@ -140,6 +153,19 @@ function make_directory_grid() {
           $.post($(this).attr("data-post-uri"), post_data, function(data) {
             window.location.href = post_data.when_done;
           });
+        });
+        $("button.rename-button").popover({
+          "html": true,
+          "title": "Rename",
+          "content": rename_form,
+          "placement": "left",
+          "trigger": "manual"
+        });
+        $("button.rename-button").click(function() {
+          $(this).popover('toggle');
+          $("form.rename").attr("action", $(this).attr("data-post-uri"));
+          $("form.rename input[name='from_name']").attr("value", $(this).attr("data-filename"));
+          $("form.rename input[name='when_done']").attr("value", $(this).attr("data-return-to"));
         });
         // dont need to show upload form if ro link
         $("div.upload-form").show();
