@@ -46,7 +46,7 @@ function readablizeBytes(bytes) {
   return (bytes / Math.pow(1024, Math.floor(e))).toFixed(2) + " " + s[e];
 }
 
-function fill_grid_rows(children, currentId) {
+function fill_grid_rows(children) {
   var file_uri = null;
   var size = null;
   var obj_uri = null;
@@ -112,10 +112,10 @@ function light_up_table(child_rows, currentId) {
   return true;
 }
 
-function make_directory_grid(currentId) {
+function make_directory_grid() {
   // make a call for json data at api uri
   $.getJSON(uri_map.dir_api + currentId, function(data) {
-    var child_rows = fill_grid_rows(data[1].children, currentId);
+    var child_rows = fill_grid_rows(data[1].children);
     // if nothing in array dont make table or show upload stuffs
     if (child_rows.index != 0) {
       var title = 'Directory: ' + data[1].verify_uri.substr(18, 5);
@@ -147,13 +147,19 @@ function make_directory_grid(currentId) {
   return true;
 }
 
+// our currentId global
+var currentId = null;
 $(document).ready(function() {
 
   // dynamically create regex for matching view (dirs) uris
-  var re = new RegExp("^" + uri_map.dir_id.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1") + "((?:ro/)?(?:(?:\\w{26}\\/\\w{52})|(?:\\w{52}\\/\\w{26})))\\/?$","g");
+  var re = "((?:ro/)?";
+  re += reverse_uris ? "\\w{52}\\/\\w{26}" : "\\w{26}\\/\\w{52}";
+  re += ")\\/?$";
+  re = new RegExp("^" + uri_map.dir_id.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1") + re,"g");
   var matched_id = re.exec(location.pathname);
   if ( matched_id != null ) {
-    make_directory_grid(matched_id[1]);
+    currentId = matched_id[1];
+    make_directory_grid();
   }
 
 });
