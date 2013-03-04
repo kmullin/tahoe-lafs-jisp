@@ -30,12 +30,15 @@ function get_link(lafs_uri) {
   return '';
 }
 
-function gen_unlink_button(filename, post_uri, return_to) {
+function gen_buttons(filename, post_uri, return_to) {
   var link_a = new Array();
-  link_a.push('<a href="" class="unlink_button text-error" data-return-to="' + return_to + '"');
-  link_a.push(' data-filename="' + filename + '"');
-  link_a.push(' data-post-uri="' + post_uri + '"');
-  link_a.push('>delete</a>');
+  $.each(['unlink', 'rename'], function(i, type) {
+    link_a.push('<button class="btn btn-danger btn-mini ' + type + '-button"');
+    link_a.push(' data-return-to="' + return_to + '"');
+    link_a.push(' data-filename="' + filename + '"');
+    link_a.push(' data-post-uri="' + post_uri + '"');
+    link_a.push('>' + (type == 'unlink' ? 'delete' : type) + '</button> ');
+  })
   return ' ' + link_a.join('');
 }
 
@@ -77,7 +80,7 @@ function fill_grid_rows(children) {
       child_rows.push([name_link, type, size, ctime]);
     }
     else {
-      child_rows.push([name_link, type, size, ctime, gen_unlink_button(name, uri_map.dir_api + currentId, uri_map.dir_id + currentId)]);
+      child_rows.push([name_link, type, size, ctime, gen_buttons(name, uri_map.dir_api + currentId, uri_map.dir_id + currentId)]);
     }
   });
   return child_rows;
@@ -102,7 +105,7 @@ function light_up_table(child_rows, currentId) {
   };
   if (currentId.substr(0,3) != "ro/") {
     // options for additional column in datatable
-    table_config.aoColumns.push({"sTitle": "Options"});
+    table_config.aoColumns.push({"sTitle": "Options", "sWidth": "15%"});
     table_config.aoColumnDefs.push({ "bSortable": false, "aTargets": [ -1 ] });
     table_config.aoColumnDefs.push({ "bSearchable": false, "aTargets": [ -1 ] });
     table_config.aoColumnDefs.push({ "sClass": 'text-right', "aTargets": [ -1 ] });
@@ -129,7 +132,7 @@ function make_directory_grid() {
         $("form").attr("action", uri_map.dir_api + currentId);
         $("input.return_to").attr("value", location.pathname);
         $("a.current-ro-link").attr("href", get_link(data[1].ro_uri));
-        $("a.unlink_button").click(function() {
+        $("button.unlink-button").click(function() {
           var post_data = {};
           post_data.t = 'unlink';
           post_data.name = $(this).attr("data-filename");
