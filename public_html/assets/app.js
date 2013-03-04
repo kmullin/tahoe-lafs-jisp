@@ -123,13 +123,12 @@ function make_directory_grid() {
       document.title = title;
       $("h3.heading").text(title).show();
       light_up_table(child_rows, currentId); // init table
-      $("form").attr("action", uri_map.dir_api + currentId);
-      $("input.return_to").attr("value", location.pathname);
       $("abbr.timeago").timeago();
-      var ro_link = get_link(data[1].ro_uri);
-      $("a.current-ro-link").attr("href", ro_link);
       // do stuff with non-read only links after table is generated
       if (currentId.substr(0,3) != "ro/") {
+        $("form").attr("action", uri_map.dir_api + currentId);
+        $("input.return_to").attr("value", location.pathname);
+        $("a.current-ro-link").attr("href", get_link(data[1].ro_uri));
         $("a.unlink_button").click(function() {
           var post_data = {};
           post_data.t = 'unlink';
