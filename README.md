@@ -54,10 +54,10 @@ Afterwards just include it in your nginx `http { }` block like so:
 ```nginx
 http {
 
-    # ... SNIP ...
+  # ... SNIP ...
 
-    # include Tahoe gateway config
-    include /path_to_edited_nginx_vhost.conf;
+  # include Tahoe gateway config
+  include /path_to_edited_nginx_vhost.conf;
 }
 ```
 
@@ -79,21 +79,21 @@ If you wanted to host this frontend (or any static webpage) on Tahoe-LAFS and wa
 sections in the nginx config file to show you how to do it. You'd do something like this:
 
 ```nginx
-  # Main landing page will be requested from Tahoe <RO DIRCAP>/index.html
-  location = / {
-    rewrite ^ /uri/URI:DIR2-RO:gdfys4rrb421cqprha46tu3edm:wwyfx52w7fre7ujbczcny6dy374ozihwarwjwkgpy77ymxcwkita/index.html break;
-    proxy_pass http://127.0.0.1:3456;
-  }
+# Main landing page will be requested from Tahoe <RO DIRCAP>/index.html
+location = / {
+  rewrite ^ /uri/URI:DIR2-RO:gdfys4rrb421cqprha46tu3edm:wwyfx52w7fre7ujbczcny6dy374ozihwarwjwkgpy77ymxcwkita/index.html break;
+  proxy_pass http://127.0.0.1:3456;
+}
 
-  # serve assets with max expire times (public content)
-  location ^~ /assets/ {
-    add_header Cache-Control public;
-    expires max;
+# serve assets with max expire times (public content)
+location ^~ /assets/ {
+  add_header Cache-Control public;
+  expires max;
 
-    # this will send all requests for /assets/ and to Tahoe <RO DIRCAP>/assets/
-    rewrite ^ /uri/URI:DIR2-RO:gdfys4rrb421cqprha46tu3edm:wwyfx52w7fre7ujbczcny6dy374ozihwarwjwkgpy77ymxcwkita$uri break;
-    proxy_pass http://127.0.0.1:3456;
-  }
+  # this will send all requests for /assets/ and to Tahoe <RO DIRCAP>/assets/
+  rewrite ^ /uri/URI:DIR2-RO:gdfys4rrb421cqprha46tu3edm:wwyfx52w7fre7ujbczcny6dy374ozihwarwjwkgpy77ymxcwkita$uri break;
+  proxy_pass http://127.0.0.1:3456;
+}
 ```
 
 With this example, requests for `example.com` (and subsequent requests for anything under `/assets/`) would be fetched
@@ -104,35 +104,35 @@ which will have nginx save the static content to disk for a certain duration of 
 
 First you need to add a single line to your global nginx config, inside the `http { }` block:
 ```nginx
-  # Set a place to save the cached content
-  # limit it to 10 megs, and make content last
-  # 1 day in the cache if unrequested
-  proxy_cache_path proxy_cache/tahoe keys_zone=tahoe:10m inactive=1d;
+# Set a place to save the cached content
+# limit it to 10 megs, and make content last
+# 1 day in the cache if unrequested
+proxy_cache_path proxy_cache/tahoe keys_zone=tahoe:10m inactive=1d;
 ```
 
 Then just use `proxy_cache tahoe;` under all the locations you wanted to cache content from Tahoe:
 
 ```nginx
-  # cache any 200 response for 1 day
-  # (only valid where proxy_cache tahoe is specified)
-  proxy_cache_valid 200 1d;
+# cache any 200 response for 1 day
+# (only valid where proxy_cache tahoe is specified)
+proxy_cache_valid 200 1d;
 
-  location = / {
-    proxy_cache tahoe; # cache the index.html page
-    rewrite ^ /uri/URI:DIR2-RO:gdfys4rrb421cqprha46tu3edm:wwyfx52w7fre7ujbczcny6dy374ozihwarwjwkgpy77ymxcwkita/index.html break;
-    proxy_pass http://127.0.0.1:3456;
-  }
+location = / {
+  proxy_cache tahoe; # cache the index.html page
+  rewrite ^ /uri/URI:DIR2-RO:gdfys4rrb421cqprha46tu3edm:wwyfx52w7fre7ujbczcny6dy374ozihwarwjwkgpy77ymxcwkita/index.html break;
+  proxy_pass http://127.0.0.1:3456;
+}
 ```
 
 ### Screenshots
 
 Here are some screenshots of what it looks like.
 
-Directory:
-![Screen 1](https://raw.github.com/kmullin/tahoe-lafs-jisp/master/misc/screenshot_1.png)
+**Directory:**
+![Directory Interface Screenshot](https://raw.github.com/kmullin/tahoe-lafs-jisp/master/misc/screenshot_1.png)
 
-Read-only Directory:
-![Screen 2](https://raw.github.com/kmullin/tahoe-lafs-jisp/master/misc/screenshot_2.png)
+**Read-only Directory:**
+![Read-only Directory Interface Screenshot](https://raw.github.com/kmullin/tahoe-lafs-jisp/master/misc/screenshot_2.png)
 
 
 
