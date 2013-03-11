@@ -124,6 +124,17 @@ Then just use `proxy_cache tahoe;` under all the locations you wanted to cache c
   }
 ```
 
+### Screenshots
+
+Here are some screenshots of what it looks like.
+
+Directory:
+![Screen 1](https://raw.github.com/kmullin/tahoe-lafs-jisp/master/misc/screenshot_1.png)
+
+Read-only Directory:
+![Screen 2](https://raw.github.com/kmullin/tahoe-lafs-jisp/master/misc/screenshot_2.png)
+
+
 
 ## FAQ
 
