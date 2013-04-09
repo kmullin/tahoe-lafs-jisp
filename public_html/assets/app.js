@@ -137,7 +137,7 @@ function make_directory_grid() {
       var title = 'Directory: ' + data[1].verify_uri.substr(18, 5);
       title += (currentId.substr(0,3) == 'ro/') ? ' (ro)' : '';
       document.title = title;
-      $("h3.heading").text(title).show();
+      $("a.current-dir").text(title);
       light_up_table(child_rows, currentId); // init table
       $("abbr.timeago").timeago();
       // do stuff with non-read only links after table is generated
